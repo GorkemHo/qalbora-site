@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qalbora Dünya Verisi / World Data</title>
+<meta name="description" content="Qalbora uygulamasındaki dünya şehirleri ve saat dilimi sınırları: kaynaklar, lisanslar, üretim adımları.">
+<link rel="icon" href="../icon.png">
+<style>
+  :root { --bg: #F8F6EE; --ink: #15221E; --muted: #4C5B55; --accent: #0E5446; --line: #E1DFD3; --card: #FFFFFF; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #061D19; --ink: #E4EEE9; --muted: #A9C2B8; --accent: #E8C77A; --line: #173D35; --card: #0A2621; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; overflow-wrap: anywhere; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  header img { width: 56px; height: 56px; border-radius: 14px; flex: none; }
+  h1 { margin: 0; font-size: 26px; line-height: 1.2; }
+  h2 { margin: 36px 0 8px; font-size: 22px; color: var(--accent); border-top: 1px solid var(--line); padding-top: 24px; }
+  h3 { margin: 22px 0 4px; font-size: 18px; }
+  .meta { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+  .summary { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 6px 8px 6px 0; vertical-align: top; }
+  code { font-size: 14px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <img src="../icon.png" alt="">
+  <div>
+    <h1>Qalbora Dünya Verisi<br>World Data</h1>
+    <p class="meta">Sürüm / Version: Qalbora 1.0.3 · Üretim / Built: 29 Ekim 2026 / 29 October 2026</p>
+  </div>
+</header>
+
+<h2>Türkçe</h2>
+<p class="summary">Qalbora, Türkiye dışında namaz vakitlerini koordinattan hesaplamak için iki veri dosyası kullanır. Bu sayfa, lisansların gerektirdiği gibi, bu dosyaları kaynaklarıyla ve nasıl üretildikleriyle birlikte herkese açık sunar.</p>
+
+<h3>Dosyalar</h3>
+<table>
+  <tr><th>Dosya</th><th>İçerik</th><th>Lisans</th></tr>
+  <tr><td><a href="timezones.bin">timezones.bin</a></td><td>Saat dilimi sınır çokgenleri, ~1 km sadeleştirilmiş. Türetilmiş bir veritabanıdır.</td><td>Open Database License (ODbL) 1.0</td></tr>
+  <tr><td><a href="cities.tsv">cities.tsv</a></td><td>Nüfusu 15.000'den büyük 33.756 şehir (Türkiye hariç) ve her şehrin saat dilimi.</td><td>Şehir kayıtları: CC BY 4.0 (GeoNames). Saat dilimi sütunu çokgenlerden türetildiği için: ODbL 1.0.</td></tr>
+  <tr><td><a href="build_world.dart">build_world.dart</a></td><td>Dosyaları kaynaklardan üreten araç (Dart).</td><td>Qalbora; üretim yöntemini göstermek için yayımlanır.</td></tr>
+  <tr><td><a href="ODbL-1.0.txt">ODbL-1.0.txt</a></td><td>Open Database License 1.0 tam metni.</td><td>—</td></tr>
+</table>
+
+<h3>Kaynaklar</h3>
+<ul>
+  <li><strong>Saat dilimi sınırları:</strong> <a href="https://github.com/evansiroky/timezone-boundary-builder">timezone-boundary-builder</a>, sürüm 2026e, <code>timezones.geojson</code> (birleştirilmemiş, her IANA kimliği ayrı). Veri © OpenStreetMap katkıcıları, <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a>.</li>
+  <li><strong>Şehirler:</strong> <a href="https://www.geonames.org">GeoNames</a> <code>cities15000</code>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</li>
+  <li><strong>Ülke adları</strong> (uygulama içinde): Unicode CLDR 49, Unicode License v3.</li>
+</ul>
+
+<h3>Üretim adımları (yapılan değişiklikler)</h3>
+<ol>
+  <li><code>timezones.geojson</code> içindeki her çokgen halkası Douglas-Peucker yöntemiyle 0,01° (~1 km) toleransla sadeleştirilir (kapalı halka ikiye bölünerek), koordinatlar 0,001°'ye yuvarlanır; 4 noktadan küçük halkalar atılır.</li>
+  <li>Sonuç <code>QTZ1</code> ikili biçiminde yazılır: kimlik sayısı ve IANA kimlikleri; her çokgen için kimlik sırası, halka sayısı, her halkada nokta sayısı ve 0,001° birimli, öncekine göre fark kodlanmış (zigzag varint) boylam/enlem çiftleri.</li>
+  <li>GeoNames <code>cities15000</code> satırlarından Türkiye satırları çıkarılır; her şehrin saat dilimi, şehrin koordinatında <em>sadeleştirilmemiş</em> çokgenlerden bulunur (çokgen dışındaysa GeoNames'in kendi alanı). Koordinatlar 3 haneye, nüfus bin kişiye yuvarlanır; satırlar ülkeye ve GeoNames kimliğine göre sıralanır.</li>
+  <li>Araç: <code>dart run tool/build_world.dart &lt;önbellek&gt;</code>. Aynı kaynaklarla çalıştırıldığında aynı dosyalar üretilir.</li>
+</ol>
+<p>Uygulama bu dosyaları cihazda kullanır, internete bağlanmaz. Sadeleştirme yüzünden sınıra ~1 km yakın noktalarda komşu saat dilimi çıkabilir; uygulama bu durumda kullanıcıyı uyarır ve saat dilimini elle seçmeye izin verir.</p>
+
+<h2>English</h2>
+<p class="summary">Outside Türkiye, Qalbora calculates prayer times from coordinates using two data files. As the licenses require, this page makes these files publicly available together with their sources and how they were produced.</p>
+
+<h3>Files</h3>
+<ul>
+  <li><a href="timezones.bin">timezones.bin</a>: time zone boundary polygons simplified to ~1 km. This is a Derivative Database, licensed under the <strong>Open Database License (ODbL) 1.0</strong>.</li>
+  <li><a href="cities.tsv">cities.tsv</a>: 33,756 cities with a population above 15,000 (Türkiye excluded) and each city's time zone. City records: CC BY 4.0 (GeoNames); the time zone column is derived from the polygons and is made available under ODbL 1.0.</li>
+  <li><a href="build_world.dart">build_world.dart</a>: the tool (Dart) that produces the files from the sources.</li>
+  <li><a href="ODbL-1.0.txt">ODbL-1.0.txt</a>: full text of the Open Database License 1.0.</li>
+</ul>
+
+<h3>Sources</h3>
+<ul>
+  <li><strong>Time zone boundaries:</strong> timezone-boundary-builder release 2026e, <code>timezones.geojson</code> (unmerged, one feature per IANA id). Contains information from timezone-boundary-builder, which is made available here under the Open Database License (ODbL). Data © OpenStreetMap contributors.</li>
+  <li><strong>Cities:</strong> GeoNames <code>cities15000</code>, CC BY 4.0.</li>
+  <li><strong>Country names</strong> (in the app): Unicode CLDR 49, Unicode License v3.</li>
+</ul>
+
+<h3>Production steps (alterations)</h3>
+<ol>
+  <li>Every polygon ring in <code>timezones.geojson</code> is simplified with Douglas-Peucker at a 0.01° (~1 km) tolerance (closed rings split in two); coordinates are rounded to 0.001°; rings with fewer than 4 points are dropped.</li>
+  <li>The result is written in the <code>QTZ1</code> binary format: the number of ids and the IANA ids; for each polygon the id index, the ring count, and for each ring the point count followed by delta-encoded (zigzag varint) longitude/latitude pairs in units of 0.001°.</li>
+  <li>From GeoNames <code>cities15000</code>, rows for Türkiye are removed; each city's time zone is looked up at the city's coordinates in the <em>unsimplified</em> polygons (GeoNames' own field if outside all polygons). Coordinates are rounded to 3 decimals and population to thousands; rows are sorted by country and GeoNames id.</li>
+  <li>Tool: <code>dart run tool/build_world.dart &lt;cache&gt;</code>. Running it on the same sources produces the same files.</li>
+</ol>
+<p><a href="../">Qalbora</a> · <a href="../privacy/">Gizlilik / Privacy</a></p>
+</main>
+</body>
+</html>
