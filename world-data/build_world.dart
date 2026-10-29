@@ -14,7 +14,7 @@
 // - Ülke adları (TR/EN): Unicode CLDR, Unicode License v3.
 //
 // Saat dilimi kimlikleri IANA adıyla saklanır (ör. Europe/Oslo). Uygulama
-// `timezone` paketinin küçük verisini (latest_10y) yükler; orada tzdb'nin
+// `timezone` paketinin "latest" verisini yükler (main.dart); orada tzdb'nin
 // "link" kimlikleri yok (Europe/Oslo, Europe/Berlin'in eşi). Bunlar için
 // 1970-2040 arasında saat kuralları birebir aynı olan bölge bulunur ve
 // lib/domain/location/world_time_zones.g.dart'a yazılır; hesapta o kullanılır.
@@ -27,7 +27,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:timezone/data/latest_10y.dart' as tzdata;
+import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/data/latest_all.dart' as tzall;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -164,7 +164,7 @@ Future<void> main(List<String> args) async {
   final aliasDart = StringBuffer()
     ..writeln('// Üretildi: tool/build_world.dart — elle değiştirmeyin.')
     ..writeln('//')
-    ..writeln('// tzdb link kimlikleri → uygulamanın yüklediği saat dilimi verisindeki (latest_10y)')
+    ..writeln('// tzdb link kimlikleri → uygulamanın yüklediği saat dilimi verisindeki (latest)')
     ..writeln('// eşdeğer bölge: 1970-2040 arasında saat kuralları birebir aynı. Kimlik IANA')
     ..writeln('// adıyla saklanır ve gösterilir; hesap eşdeğer bölgeyle yapılır.')
     ..writeln('const timeZoneAliases = <String, String>{');
